@@ -1,8 +1,8 @@
 {
   "name": "component-google-drive-picker",
   "version": "0.1.0",
-  "description": "Google Drive Picker",
-  "main": "index.js",
+  "description": "A handy widget settings UI component to launch Google Drive Picker",
+  "main": "gulpfile.js",
   "scripts": {
     "test": "gulp test",
     "build": "gulp build"
@@ -11,11 +11,12 @@
     "type": "git",
     "url": "https://github.com/Rise-Vision/component-google-drive-picker.git"
   },
-  "author": "",
+  "author": "Rise Vision",
   "license": "GPLv3",
   "bugs": {
     "url": "https://github.com/Rise-Vision/component-google-drive-picker/issues"
   },
+  "homepage": "https://github.com/Rise-Vision/component-google-drive-picker",
   "devDependencies": {
     "casperjs": "^1.1.0-beta3",
     "chai": "~1.9.1",
