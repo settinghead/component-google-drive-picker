@@ -1,0 +1,36 @@
+{
+  "name": "component-google-drive-picker",
+  "version": "0.1.0",
+  "description": "Google Drive Picker",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test",
+    "build": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Rise-Vision/component-google-drive-picker.git"
+  },
+  "author": "",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/Rise-Vision/component-google-drive-picker/issues"
+  },
+  "devDependencies": {
+    "casperjs": "^1.1.0-beta3",
+    "chai": "~1.9.1",
+    "chai-as-promised": "~4.1.1",
+    "gulp": "~3.8.1",
+    "gulp-bump": "~0.1.8",
+    "gulp-concat": "^2.2.0",
+    "gulp-connect": "~2.0.5",
+    "gulp-html2string": "git://github.com/Rise-Vision/gulp-html2string",
+    "gulp-minify-css": "^0.3.5",
+    "gulp-protractor": "~0.0.8",
+    "gulp-rename": "~1.2.0",
+    "gulp-sass": "^0.7.2",
+    "gulp-util": "~2.2.17",
+    "phantomjs": "^1.9.7-9",
+    "spawn-cmd": "0.0.2"
+  }
+}
