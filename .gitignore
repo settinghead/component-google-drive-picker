@@ -3,4 +3,6 @@ components/
 node_modules/
 test_reports/
 coverage/
-src/js/config/config.js
+src/config/config.js
+src/sass/**/*.css
+tmp
