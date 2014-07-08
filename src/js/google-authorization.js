@@ -7,16 +7,12 @@ if (typeof RiseVision === "undefined") {
 
   RiseVision.Authorization = (function () {
 
-    var DEFAULT_CLIENT_ID = "614513768474.apps.googleusercontent.com",
-
-      oauthToken = null,
+    var oauthToken = null,
       loaded = false;
 
     function authorize(immediate, scope, callbackFn) {
-      var clientId = CONFIG.GOOGLE_CLIENT_ID || DEFAULT_CLIENT_ID;
-
       gapi.auth.authorize({
-        client_id : clientId,
+        client_id : CONFIG.GOOGLE_CLIENT_ID,
         scope : scope,
         immediate : immediate
       }, function (authResult) {
