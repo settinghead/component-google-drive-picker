@@ -65,7 +65,7 @@ if (typeof RiseVision === "undefined") {
  *  Use of this software is governed by the GPLv3 license
  *  (reproduced in the LICENSE file).
  */
-;(function ($, window, document, TEMPLATES, CONFIG, undefined) {
+;(function ($, window, document, TEMPLATES, undefined) {
   "use strict";
 
   var _pluginName = "googleDrivePicker";
@@ -75,17 +75,39 @@ if (typeof RiseVision === "undefined") {
 
       AUTH_SCOPE = "https://www.googleapis.com/auth/drive",
 
+      EVENT_PICKED = "picked",
+      EVENT_OPEN = "open",
+      EVENT_CANCEL = "cancel",
+
       _$element = $(element),
       _$button = null,
       _origin,
       _pickerApiLoaded = false,
-      _viewMap = {};
+      _viewMap = {},
+      _viewId = options.viewId || "docs",
+      _pickerVisible = false;
 
-    options = $.extend({}, {"viewId": "docs"}, options);
+    function _getViewId() {
+      return _viewId;
+    }
+
+    function _setViewId(value) {
+      if (typeof value === "string") {
+        _viewId = value;
+      }
+    }
+
+    function _isPickerVisible() {
+      return _pickerVisible;
+    }
 
     function _onPickerAction(data) {
       if (data[google.picker.Response.ACTION] === google.picker.Action.PICKED) {
-        //TODO: Sort out what to do with data
+        _$element.trigger(EVENT_PICKED, [data[google.picker.Response.DOCUMENTS]]);
+        _pickerVisible = false;
+      } else if (data[google.picker.Response.ACTION] === google.picker.Action.CANCEL) {
+        _$element.trigger(EVENT_CANCEL);
+        _pickerVisible = false;
       }
     }
 
@@ -93,12 +115,15 @@ if (typeof RiseVision === "undefined") {
       if (_pickerApiLoaded && authorization.getAuthToken()) {
         var picker = new google.picker.PickerBuilder()
           .setOrigin(_origin)
-          .addView(_viewMap[options.viewId])
+          .addView(_viewMap[_viewId])
           .setOAuthToken(authorization.getAuthToken())
           .setCallback(_onPickerAction)
           .build();
 
         picker.setVisible(true);
+        _pickerVisible = true;
+
+        _$element.trigger(EVENT_OPEN);
       }
     }
 
@@ -116,7 +141,7 @@ if (typeof RiseVision === "undefined") {
         "docs_videos": google.picker.ViewId.DOCS_VIDEOS,
         "folders": google.picker.ViewId.FOLDERS,
         "pdfs": google.picker.ViewId.PDFS
-      }
+      };
 
       _createPicker();
     }
@@ -145,12 +170,22 @@ if (typeof RiseVision === "undefined") {
     }
 
     function _init() {
+      var parser = document.createElement('a');
+
       // Get the HTML markup from the template.
       _$element.append(TEMPLATES['google-drive-picker-template.html']);
 
       _$button = _$element.find(".btn-google");
 
-      _origin = document.referrer.split("/").slice(0, 3).join("/") + "/";
+      if (document.referrer) {
+        parser.href = document.referrer;
+        _origin = parser.protocol + "//" + parser.hostname;
+      } else {
+        /* Testing component locally (http://localhost:8099), so component is
+         not within an iframe
+          */
+        _origin = window.location.protocol + '//' + window.location.host;
+      }
 
       if (!authorization.isApiLoaded()) {
         authorization.loadApi(function () {
@@ -168,7 +203,9 @@ if (typeof RiseVision === "undefined") {
     _init();
 
     return {
-      //TODO: Provide any public API (if necessary)
+      getViewId: _getViewId,
+      setViewId: _setViewId,
+      isPickerVisible: _isPickerVisible
     };
   }
 
@@ -176,11 +213,11 @@ if (typeof RiseVision === "undefined") {
    *  A lightweight plugin wrapper around the constructor that prevents
    *  multiple instantiations.
    */
-  $.fn.googleDrivePicker = function(options) {
-    return this.each(function() {
+  $.fn.googleDrivePicker = function (options) {
+    return this.each(function () {
       if (!$.data(this, "plugin_" + _pluginName)) {
         $.data(this, "plugin_" + _pluginName, new Plugin(this, options));
       }
     });
   };
-})(jQuery, window, document, TEMPLATES, CONFIG);
+})(jQuery, window, document, TEMPLATES);
