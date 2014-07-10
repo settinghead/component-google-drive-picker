@@ -119,7 +119,7 @@
   });
 
   gulp.task("build", function (cb) {
-    runSequence("clean", ["js-uglify", "css-min"], cb);
+    runSequence("clean", ["js-uglify"/*, "css-min"*/], cb);
   });
 
   gulp.task("test", ["e2e:test"]);
