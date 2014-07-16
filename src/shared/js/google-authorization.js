@@ -33,9 +33,9 @@ if (typeof RiseVision === "undefined") {
 
     function loadApi(callbackFn) {
       // Use the API Loader script to load the Authentication script.
-      gapi.load('auth', {'callback': function () {
+      gapi.load("auth", {"callback": function () {
         loaded = true;
-        if (typeof callbackFn === 'function') {
+        if (typeof callbackFn === "function") {
           callbackFn.apply(null);
         }
       }});
