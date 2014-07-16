@@ -65,16 +65,15 @@ if (typeof RiseVision === "undefined") {
  *  Use of this software is governed by the GPLv3 license
  *  (reproduced in the LICENSE file).
  */
-;(function ($, window, document, TEMPLATES, undefined) {
+;(function (RiseVision, $, window, document, TEMPLATES, undefined) {
   "use strict";
 
   var _pluginName = "googleDrivePicker";
 
   function Plugin(element, options) {
-    var authorization = RiseVision.Authorization,
 
+      var authorization = RiseVision.Authorization,
       AUTH_SCOPE = "https://www.googleapis.com/auth/drive",
-
       EVENT_PICKED = "picked",
       EVENT_OPEN = "open",
       EVENT_CANCEL = "cancel",
@@ -129,7 +128,6 @@ if (typeof RiseVision === "undefined") {
 
     function _onPickerApiLoaded() {
       _pickerApiLoaded = true;
-
       _viewMap = {
         "docs": google.picker.ViewId.DOCS,
         "docs_images": google.picker.ViewId.DOCS_IMAGES,
@@ -173,6 +171,7 @@ if (typeof RiseVision === "undefined") {
       var parser = document.createElement('a');
 
       // Get the HTML markup from the template.
+
       _$element.append(TEMPLATES['google-drive-picker-template.html']);
 
       _$button = _$element.find(".btn-google");
@@ -220,4 +219,4 @@ if (typeof RiseVision === "undefined") {
       }
     });
   };
-})(jQuery, window, document, TEMPLATES);
+})(RiseVision, jQuery, window, document, TEMPLATES);

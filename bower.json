@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "jquery": "1.11.0",
-    "bootstrap": "3.1.1",
-    "angular": "~1.2.18"
+    "bootstrap": "git://github.com/Rise-Vision/bootstrap",
+    "style-common": "git://github.com/Rise-Vision/style-common",
+    "angular": "1.2.18"
   }
 }

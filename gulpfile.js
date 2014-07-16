@@ -2,9 +2,7 @@
   "use strict";
 
   var gulp = require("gulp");
-  var spawn = require("spawn-cmd").spawn;
   var gutil = require("gulp-util");
-  var connect = require("gulp-connect");
   var html2string = require("gulp-html2string");
   var path = require("path");
   var rename = require("gulp-rename");
@@ -15,7 +13,7 @@
   var minifyCSS = require("gulp-minify-css");
   var runSequence = require("run-sequence");
   var uglify = require("gulp-uglify");
-  var httpServer;
+  var factory = require("widget-tester").gulpTaskFactory;
 
   gulp.task("clean-dist", function () {
     return gulp.src("dist", {read: false})
@@ -44,15 +42,6 @@
     return gulp.src(["./package.json", "./bower.json"])
     .pipe(bump({type:"patch"}))
     .pipe(gulp.dest("./"));
-  });
-
-  gulp.task("e2e:server", ["build"], function() {
-    httpServer = connect.server({
-      root: "./",
-      port: 8099,
-      livereload: false
-    });
-    return httpServer;
   });
 
   gulp.task("sass", function () {
@@ -102,27 +91,38 @@
       .pipe(gulp.dest("dist/js"));
   });
 
-  gulp.task("e2e:test", ["build", "e2e:server"], function () {
-      var tests = ["test/e2e/google-drive-picker-scenarios.js"];
-
-      var casperChild = spawn("casperjs", ["test"].concat(tests));
-
-      casperChild.stdout.on("data", function (data) {
-          gutil.log("CasperJS:", data.toString().slice(0, -1)); // Remove \n
-      });
-
-      casperChild.on("close", function (code) {
-          var success = code === 0; // Will be 1 in the event of failure
-          connect.serverClose();
-          // Do something with success here
-      });
-  });
-
-  gulp.task("build", function (cb) {
+  gulp.task("build", ["test"], function (cb) {
     runSequence("clean", ["js-uglify"/*, "css-min"*/], cb);
   });
 
-  gulp.task("test", ["e2e:test"]);
+  gulp.task("e2e:server", factory.testServer());
+  gulp.task("e2e:server-close", factory.testServerClose());
+
+  gulp.task("test:e2e:core", factory.testE2E({
+    testFiles: path.join(__dirname, "test", "e2e", "*test.js")
+  }));
+  gulp.task("test:e2e", function(cb) {
+    return runSequence("e2e:server", "test:e2e:core",
+    function (err) {
+      gulp.run("e2e:server-close");
+      cb(err);
+    });
+  });
+
+  gulp.task("webdriver_update", factory.webdriveUpdate());
+
+  gulp.task("test:e2e:ng:core", factory.testE2EAngular());
+  gulp.task("test:e2e:ng", ["webdriver_update"], function(cb) {
+    return runSequence("e2e:server", "test:e2e:ng:core",
+    function (err) {
+      gulp.run("e2e:server-close");
+      cb(err);
+    });
+  });
+
+  gulp.task("test", function(cb) {
+    return runSequence("test:e2e", "test:e2e:ng", cb);
+  });
 
   gulp.task("default", ["build"]);
 
