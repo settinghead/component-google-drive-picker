@@ -25,9 +25,9 @@ casper.test.begin("Google Drive Picker: Pick a file", function (test) {
       //simulate a file pick
       window.pickFiles(["test_file"]);
     });
-    this.evaluateOrDie(function () {
+    test.assertEval(function () {
       return window.filesPicked[0] === "test_file";
-    });
+    }, "files should be successfully picked.");
   });
   casper.run(function() {
     test.done();
@@ -42,9 +42,9 @@ casper.test.begin("Google Drive Picker: Cancel Dialog", function (test) {
     this.evaluate(function simulateDialogCancel () {
       window.dialogCancel();
     });
-    this.evaluateOrDie(function () {
+    test.assertEval(function () {
       return window.cancelled === true;
-    });
+    }, "dialog should be successfully cancelled.");
   });
 
   casper.run(function() {

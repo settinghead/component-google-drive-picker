@@ -12,8 +12,16 @@
   var sass = require("gulp-sass");
   var minifyCSS = require("gulp-minify-css");
   var runSequence = require("run-sequence");
+  var jshint = require("gulp-jshint");
   var uglify = require("gulp-uglify");
+  var html2js = require("gulp-html2js");
   var factory = require("widget-tester").gulpTaskFactory;
+
+  var jsFiles = [
+    "src/**/*.js",
+    "test/**/*.js",
+    "!./src/components/**/*"
+  ];
 
   gulp.task("clean-dist", function () {
     return gulp.src("dist", {read: false})
@@ -44,6 +52,13 @@
     .pipe(gulp.dest("./"));
   });
 
+  gulp.task("lint", function() {
+    return gulp.src(jsFiles)
+      .pipe(jshint())
+      .pipe(jshint.reporter("jshint-stylish"));
+    // .pipe(jshint.reporter("fail"));
+  });
+
   gulp.task("sass", function () {
     return gulp.src("src/sass/main.scss")
       .pipe(sass())
@@ -66,24 +81,50 @@
   });
 
   gulp.task("html2js", function () {
-    return gulp.src("src/html/*.html")
-      .pipe(html2string({ createObj: true, base: path.join(__dirname, "src/html"), objName: "TEMPLATES" }))
+    return gulp.src("src/shared/html/*.html")
+      .pipe(html2string({ createObj: true, base: path.join(__dirname, "src/shared/html"), objName: "TEMPLATES" }))
       .pipe(rename({extname: ".js"}))
       .pipe(gulp.dest("tmp/templates/"));
   });
 
-  gulp.task("concat-js", ["clean", "config", "html2js"], function () {
+  gulp.task("jquery", function () {
     return gulp.src([
       "src/config/config.js",
-      "tmp/templates/*.js", //template js files
-      "src/js/*.js"])
+      "tmp/templates/*.js",
+      "src/shared/js/*.js",
+      "src/jquery/*.js"])
 
       .pipe(concat("google-drive-picker.js"))
-      .pipe(gulp.dest("dist/js"));
+      .pipe(gulp.dest("dist/js/jquery"));
   });
 
-  gulp.task("js-uglify", ["concat-js"], function () {
-    gulp.src("dist/js/*.js")
+  gulp.task("angular:html2js", function() {
+    return gulp.src("src/angular/*.html")
+      .pipe(html2js({
+        outputModuleName: "risevision.widget.common.google-drive-picker",
+        useStrict: true,
+        base: "src/angular"
+      }))
+      .pipe(rename({extname: ".js"}))
+      .pipe(gulp.dest("tmp/ng-templates"));
+  });
+
+  gulp.task("angular", ["angular:html2js"], function () {
+    return gulp.src([
+      "src/config/config.js",
+      "src/shared/js/*.js",
+      "src/angular/*.js",
+      "tmp/ng-templates/*.js"])
+      .pipe(concat("google-drive-picker.js"))
+      .pipe(gulp.dest("dist/js/angular"));
+  });
+
+  gulp.task("js-prep", ["html2js", "lint"], function (cb) {
+    return runSequence("jquery", "angular", cb);
+  });
+
+  gulp.task("js-uglify", ["js-prep"], function () {
+    gulp.src("dist/js/**/*.js")
       .pipe(uglify())
       .pipe(rename(function (path) {
         path.basename += ".min";
@@ -91,8 +132,8 @@
       .pipe(gulp.dest("dist/js"));
   });
 
-  gulp.task("build", ["test"], function (cb) {
-    runSequence("clean", ["js-uglify"/*, "css-min"*/], cb);
+  gulp.task("build", function (cb) {
+    runSequence(["clean", "config"], ["js-uglify"/*, "css-min"*/], cb);
   });
 
   gulp.task("e2e:server", factory.testServer());
@@ -101,6 +142,8 @@
   gulp.task("test:e2e:core", factory.testE2E({
     testFiles: path.join(__dirname, "test", "e2e", "*test.js")
   }));
+
+  // Test the jQuery version
   gulp.task("test:e2e", function(cb) {
     return runSequence("e2e:server", "test:e2e:core",
     function (err) {
@@ -110,9 +153,10 @@
   });
 
   gulp.task("webdriver_update", factory.webdriveUpdate());
-
   gulp.task("test:e2e:ng:core", factory.testE2EAngular());
-  gulp.task("test:e2e:ng", ["webdriver_update"], function(cb) {
+
+  // Test the Angular version
+  gulp.task("test:e2e:ng", ["webdriver_update"], function (cb) {
     return runSequence("e2e:server", "test:e2e:ng:core",
     function (err) {
       gulp.run("e2e:server-close");
@@ -120,7 +164,7 @@
     });
   });
 
-  gulp.task("test", function(cb) {
+  gulp.task("test", ["build"], function (cb) {
     return runSequence("test:e2e", "test:e2e:ng", cb);
   });
 
