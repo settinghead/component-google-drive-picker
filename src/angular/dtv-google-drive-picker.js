@@ -11,7 +11,7 @@
     .directive("googleDrivePicker", ["$document", "$window", "$log", "$templateCache",
       function ($document, $window, $log, $templateCache) {
       return {
-        restrict: "AE",
+        restrict: "E",
         scope: {
           viewId: "@"
         },
