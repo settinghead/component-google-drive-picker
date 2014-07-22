@@ -164,8 +164,10 @@
     });
   });
 
+  gulp.task("test:metrics", factory.metrics());
+
   gulp.task("test", ["build"], function (cb) {
-    return runSequence("test:e2e", "test:e2e:ng", cb);
+    return runSequence("test:e2e", "test:e2e:ng", "test:metrics", cb);
   });
 
   gulp.task("default", ["build"]);
