@@ -20,10 +20,9 @@
     });
 
     it("Should correctly load", function () {
-      expect(element(by.id("google-drive-picker"))
-        .findElement(by.css("img"))
-        .getAttribute("src")
-        .to.eventually.equal("../../img/widget-icon-drive-1x.png"));
+      expect(element(by.css("#google-drive-picker img"))
+        .getAttribute("src"))
+        .to.eventually.equal("http://127.0.0.1:8099/img/widget-icon-drive-1x.png");
     });
 
     it("Should correctly pick a file", function () {
