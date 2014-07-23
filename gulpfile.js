@@ -59,6 +59,11 @@
     // .pipe(jshint.reporter("fail"));
   });
 
+  gulp.task("images", function () {
+    return gulp.src("img/**/*.*", {base: "./"})
+      .pipe(gulp.dest("dist/img"));
+  });
+
   gulp.task("sass", function () {
     return gulp.src("src/sass/main.scss")
       .pipe(sass())
@@ -80,9 +85,9 @@
       .pipe(gulp.dest("dist/css"));
   });
 
-  gulp.task("html2js", function () {
-    return gulp.src("src/shared/html/*.html")
-      .pipe(html2string({ createObj: true, base: path.join(__dirname, "src/shared/html"), objName: "TEMPLATES" }))
+  gulp.task("jquery:html2js", function () {
+    return gulp.src("src/jquery/*.html")
+      .pipe(html2string({ createObj: true, base: path.join(__dirname, "src/jquery"), objName: "TEMPLATES" }))
       .pipe(rename({extname: ".js"}))
       .pipe(gulp.dest("tmp/templates/"));
   });
@@ -119,7 +124,7 @@
       .pipe(gulp.dest("dist/js/angular"));
   });
 
-  gulp.task("js-prep", ["html2js", "lint"], function (cb) {
+  gulp.task("js-prep", ["jquery:html2js", "angular:html2js","lint"], function (cb) {
     return runSequence("jquery", "angular", cb);
   });
 
@@ -133,7 +138,7 @@
   });
 
   gulp.task("build", function (cb) {
-    runSequence(["clean", "config"], ["js-uglify"/*, "css-min"*/], cb);
+    runSequence(["clean", "config"], ["images", "js-uglify"/*, "css-min"*/], cb);
   });
 
   gulp.task("e2e:server", factory.testServer());
