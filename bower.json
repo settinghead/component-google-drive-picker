@@ -16,12 +16,13 @@
     "tmp"
   ],
   "devDependencies": {
-
+    "angular-mocks": "1.2.18",
+    "q": "1.0.1",
+    "sinon": "~1.10.2"
   },
   "dependencies": {
     "jquery": "1.11.0",
-    "bootstrap": "git://github.com/Rise-Vision/bootstrap",
-    "style-common": "git://github.com/Rise-Vision/style-common",
+    "rv-style-guide": "git://github.com/Rise-Vision/style-guide#0.1.0",
     "angular": "1.2.18"
   }
 }
